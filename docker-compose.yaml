@@ -1,0 +1,30 @@
+name: rsyslog
+services:
+  rsyslog:
+    image: lscr.io/linuxserver/syslog-ng:latest
+    container_name: rsyslog
+    hostname: rsyslog
+    restart: always
+    pull_policy: always
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=${TZ:-America/New_York}
+      - LOG_TO_STDOUT=false
+    volumes:
+      - './rootfs/data/logs:/var/log'
+      - './rootfs/config/rsyslog:/config'
+    ports:
+      - '1514:5514/tcp'
+      - '1514:5514/udp'
+      - '172.17.0.1:514:5514/tcp'
+      - '172.17.0.1:514:5514/udp'
+      - '172.17.0.1:601:6601/tcp'
+      - '172.17.0.1:6514:6514/tcp'
+    networks:
+      - rsyslog
+
+networks:
+  rsyslog:
+    name: rsyslog
+    external: false
