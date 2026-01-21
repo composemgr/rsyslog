@@ -1,0 +1,39 @@
+# nginx proxy address - http://172.17.0.1:601
+
+name: rsyslog
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  app:
+    image: lscr.io/linuxserver/syslog-ng:latest
+    container_name: rsyslog-app
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      PUID: ${SERVICE_USER:-0}
+      PGID: ${SERVICE_GROUP:-0}
+      TZ: ${TZ:-America/New_York}
+      LOG_TO_STDOUT: false
+    volumes:
+      - './rootfs/data/log/rsyslog:/var/log'
+      - './rootfs/config/rsyslog:/config'
+    ports:
+      - '1514:5514/tcp'
+      - '1514:5514/udp'
+      - '172.17.0.1:514:5514/tcp'
+      - '172.17.0.1:514:5514/udp'
+      - '172.17.0.1:601:6601/tcp'
+      - '172.17.0.1:6514:6514/tcp'
+    networks:
+      - rsyslog
+
+networks:
+  rsyslog:
+    name: rsyslog
+    external: false
