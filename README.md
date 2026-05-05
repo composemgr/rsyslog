@@ -47,8 +47,8 @@ See `docker-compose.yaml` for complete list of configurable options.
 
 ## 📂 Volumes
 
-- `./rootfs/data/log/rsyslog` - Data storage
-- `./rootfs/config/rsyslog` - Data storage
+- `./volumes/data/log/rsyslog` - Data storage
+- `./volumes/config/rsyslog` - Data storage
 
 ## 🔍 Logging
 
