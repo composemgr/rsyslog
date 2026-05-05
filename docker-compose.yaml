@@ -21,8 +21,8 @@ services:
       TZ: ${TZ:-America/New_York}
       LOG_TO_STDOUT: false
     volumes:
-      - './rootfs/data/log/rsyslog:/var/log'
-      - './rootfs/config/rsyslog:/config'
+      - './volumes/data/log/rsyslog:/var/log'
+      - './volumes/config/rsyslog:/config'
     ports:
       - '1514:5514/tcp'
       - '1514:5514/udp'
