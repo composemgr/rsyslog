@@ -26,9 +26,6 @@ services:
       - './volumes/data/log/rsyslog:/var/log'
       - './volumes/config/rsyslog:/config'
     ports:
-      - '172.17.0.1:1514:5514/tcp'
-      - '172.17.0.1:1514:5514/udp'
-      - '172.17.0.1:514:5514/tcp'
       - '172.17.0.1:514:5514/udp'
       - '172.17.0.1:601:6601/tcp'
       - '172.17.0.1:6514:6514/tcp'
