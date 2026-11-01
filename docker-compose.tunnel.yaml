@@ -1,0 +1,43 @@
+
+name: rsyslog
+x-logging: &default-logging
+  options:
+    max-size: '5m'
+    max-file: '1'
+  driver: json-file
+
+services:
+  app:
+    image: lscr.io/linuxserver/syslog-ng:latest
+    container_name: rsyslog-app
+    domainname: ${BASE_DOMAIN_NAME:-example.com}
+    hostname: ${BASE_HOST_NAME:-$HOSTNAME}
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-America/New_York}
+      CONTAINER_NAME: rsyslog-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
+      # linuxserver.io image settings
+      PUID: ${SERVICE_USER:-0}
+      PGID: ${SERVICE_GROUP:-0}
+      # Write received logs to stdout as well as to disk
+      LOG_TO_STDOUT: "false"
+    volumes:
+      - './volumes/data/log/rsyslog:/var/log:z'
+      - './volumes/config/rsyslog:/config:z'
+    labels:
+      - 'cloudflare.enable=true'
+      - 'cloudflare.service=http://rsyslog-app:6601'
+      - 'cloudflare.hostname=${BASE_HOST_NAME:-$HOSTNAME}'
+    networks:
+      - rsyslog
+      - cloudflare
+
+networks:
+  rsyslog:
+    name: rsyslog
+    external: false
+  cloudflare:
+    external: true

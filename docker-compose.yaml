@@ -1,4 +1,4 @@
-# nginx proxy address - http://172.17.0.1:601
+# nginx proxy address - http://172.17.0.1:64332
 
 name: rsyslog
 x-logging: &default-logging
@@ -11,50 +11,32 @@ services:
   app:
     image: lscr.io/linuxserver/syslog-ng:latest
     container_name: rsyslog-app
+    domainname: ${BASE_DOMAIN_NAME:-example.com}
     hostname: ${BASE_HOST_NAME:-$HOSTNAME}
     restart: always
     pull_policy: always
     logging: *default-logging
     environment:
-      PUID: ${SERVICE_USER:-0}
-      PGID: ${SERVICE_GROUP:-0}
       TZ: ${TZ:-America/New_York}
-      LOG_TO_STDOUT: false
       CONTAINER_NAME: rsyslog-app
       HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
-    volumes:
-      - './volumes/data/log/rsyslog:/var/log'
-      - './volumes/config/rsyslog:/config'
+      # linuxserver.io image settings
+      PUID: ${SERVICE_USER:-0}
+      PGID: ${SERVICE_GROUP:-0}
+      # Write received logs to stdout as well as to disk
+      LOG_TO_STDOUT: "false"
     ports:
-      - '172.17.0.1:514:5514/udp'
-      - '172.17.0.1:601:6601/tcp'
-      - '172.17.0.1:6514:6514/tcp'
+      - '172.17.0.1:64332:6601/tcp'
+      - '5514:5514/udp'
+      - '6514:6514/tcp'
+      - '6601:6601/tcp'
+    volumes:
+      - './volumes/data/log/rsyslog:/var/log:z'
+      - './volumes/config/rsyslog:/config:z'
     networks:
       - rsyslog
-      - proxy
-      - cloudflare
-    labels:
-      - 'traefik.enable=true'
-      - 'cloudflare.enable=true'
-      - 'traefik.docker.network=proxy'
-      - 'cloudflare.service=http://rsyslog-app:6601'
-      - 'cloudflare.hostname=rsyslog.${CLOUDFLARE_ZONE_NAME:-}'
-      - 'traefik.http.routers.rsyslog-app.entrypoints=http'
-      - 'traefik.http.routers.rsyslog-app-secure.tls=true'
-      - 'traefik.http.routers.rsyslog-app.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
-      - 'traefik.http.middlewares.rsyslog-app-https-redirect.redirectscheme.scheme=https'
-      - 'traefik.http.routers.rsyslog-app.middlewares=rsyslog-app-https-redirect'
-      - 'traefik.http.routers.rsyslog-app-secure.entrypoints=https'
-      - 'traefik.http.routers.rsyslog-app-secure.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
-      - 'traefik.http.routers.rsyslog-app-secure.tls.certresolver=cloudflare'
-      - 'traefik.http.routers.rsyslog-app-secure.service=rsyslog-app'
-      - 'traefik.http.services.rsyslog-app.loadbalancer.server.port=6601'
 
 networks:
   rsyslog:
     name: rsyslog
     external: false
-  proxy:
-    external: true
-  cloudflare:
-    external: true
