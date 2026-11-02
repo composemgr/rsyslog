@@ -24,6 +24,10 @@ services:
       PGID: ${SERVICE_GROUP:-0}
       # Write received logs to stdout as well as to disk
       LOG_TO_STDOUT: "false"
+    ports:
+      - '5514:5514/udp'
+      - '6514:6514'
+      - '6601:6601'
     volumes:
       - './volumes/data/log/rsyslog:/var/log:z'
       - './volumes/config/rsyslog:/config:z'
